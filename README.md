@@ -8,7 +8,7 @@ Make sure to create a .env file in the directory and add the following essential
 
 ## Essential Variables
 
-PORT = Any Port
+PORT = Any Port,
 MONGO_URL = Your MongoDB connection URL
 JWT_SECRET = Secret key for JWT
 JWT_EXPIRE = JWT expiration time
