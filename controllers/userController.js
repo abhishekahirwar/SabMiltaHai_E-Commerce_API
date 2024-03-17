@@ -61,7 +61,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("Password is not matching with confirm password", 400));
     }
 
-    const { otp: storedOtp } = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
+    const { otp: storedOtp } = await OTP.findOne({ email }).sort({ createdAt: -1 });
 
     // OTP not found for the email
     if (!storedOtp || otp !== storedOtp) {
