@@ -13,10 +13,10 @@ const sendEmail = async (options) => {
     });
 
     const mailOptions = {
-        from: "SabMiltaHai E-Commerce || By- Abhi",
-        to: `${options.email}`,
-        subject: `${options.subject}`,
-        html: `${options.message}`,
+        from: process.env.SMTP_MAIL,
+        to: options.email,
+        subject: options.subject,
+        html: options.message,
     };
 
     await transporter.sendMail(mailOptions);

@@ -188,7 +188,7 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
 
     const review = {
         userId: req.user.id,
-        name: req.user.name,
+        name: req.user.firstName,
         rating: Number(rating),
         comment,
     };
@@ -200,6 +200,7 @@ exports.createProductReview = catchAsyncErrors(async (req, res, next) => {
     if (isReviewed) {
         product.reviews.forEach(rev => {
             if (rev.userId.toString() === req.user.id.toString()) {
+                rev.name = req.user.firstName;
                 rev.rating = rating;
                 rev.comment = comment;
             }
@@ -325,7 +326,7 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 
     return res.status(200).json({
         success: true,
-        message: "Add to cart successfully.",
+        message: "Product added successfully.",
     });
 });
 

@@ -4,25 +4,7 @@
 ``` npm i ```
 
 ## Env Variables
-Make sure to create a .env file in the directory and add the following essential variables to use the api.
-
-## Essential Variables
-
-* PORT = Any Port
-* MONGO_URL = Your MongoDB connection URL
-* JWT_SECRET = Secret key for JWT
-* JWT_EXPIRE = JWT expiration time
-* COOKIE_EXPIRE = Cookie expiration time
-* SMTP_SERVICE = Your SMTP service
-* SMTP_MAIL = Your SMTP email
-* SMTP_PASSWORD = Your SMTP password
-* SMTP_HOST = SMTP host
-* SMTP_PORT = SMTP port
-* STRIPE_API_KEY = Your Stripe API key
-* STRIPE_SECRET_KEY = Your Stripe secret key
-* CLOUDINARY_NAME = Your Cloudinary name
-* CLOUDINARY_API_KEY = Your Cloudinary API key
-* CLOUDINARY_API_SECRET = Your Cloudinary API secret
+Make sure to create a .env file in the directory and add the essential variables (see `.env.sample` for reference) to use the apis.
 
 ## API Features
 
@@ -68,8 +50,10 @@ Make sure to create a .env file in the directory and add the following essential
 
 # Author
 
-[GitHub](https://github.com/abhishekahirwar) **Abhishek Ahirwar**
+**Abhishek Ahirwar**
 
-[LinkedIn](https://www.linkedin.com/in/abhishek-ahirwar-85951b217) **Abhishek Ahirwar**
+[GitHub](https://github.com/abhishekahirwar) 
 
-[SabMiltaHai E-Commerce API Live Deployment](https://sabmiltahai.onrender.com) **SabMiltaHai E-Commerce API**
+[LinkedIn](https://www.linkedin.com/in/abhishek-ahirwar-85951b217)
+
+[SabMiltaHai E-Commerce API Live Deployed](https://sabmiltahai.onrender.com) **SabMiltaHai E-Commerce API**

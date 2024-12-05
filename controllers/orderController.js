@@ -49,7 +49,7 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
 
 // Get Single Order or Order Details
 exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-    const order = await Order.findOne({ _id: req.params.id, userId: req.user.id }).populate("userId", "name email");
+    const order = await Order.findOne({ _id: req.params.id, userId: req.user.id }).populate("userId", "firstName lastName email");
 
     if (!order) {
         return next(new ErrorHandler("Order not found with this Id", 404));
@@ -95,7 +95,7 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
         success: true,
         orders,
         totalAmount,
-        message: "Order Found Successfully.",
+        message: "All orders found successfully.",
     });
 });
 

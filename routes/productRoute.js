@@ -14,20 +14,20 @@ const {
     removeFromCart,
     getCartProducts
 } = require('../controllers/productController');
-const { isAuthenticatedUser, isAdmin } = require('../middleware/auth');
+const { isAuthenticatedUser, authorizeRoles } = require('../middleware/auth');
 
 const router = express.Router();
 
 // Product Route
-router.route("/admin/product/new").post(isAuthenticatedUser, isAdmin, createProduct);
+router.route("/admin/product/new").post(isAuthenticatedUser, authorizeRoles("Admin"), createProduct);
 
 router.route("/products").get(getAllProducts);
 
-router.route("/admin/products").get(isAuthenticatedUser, isAdmin, getAdminProducts);
+router.route("/admin/products").get(isAuthenticatedUser, authorizeRoles("Admin"), getAdminProducts);
 
 router.route("/admin/product/:id")
-    .put(isAuthenticatedUser, isAdmin, updateProduct)
-    .delete(isAuthenticatedUser, isAdmin, deleteProduct);
+    .put(isAuthenticatedUser, authorizeRoles("Admin"), updateProduct)
+    .delete(isAuthenticatedUser, authorizeRoles("Admin"), deleteProduct);
 
 router.route("/product/:id").get(getProductDetails);
 

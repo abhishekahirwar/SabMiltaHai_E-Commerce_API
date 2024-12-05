@@ -18,9 +18,18 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 });
 
 // isAdmin 
-exports.isAdmin = catchAsyncErrors(async (req, res, next) => {
-    if (req.user.role !== "Admin") {
-        return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resource`, 403));
-    }
-    next();
-});
+// exports.isAdmin = catchAsyncErrors(async (req, res, next) => {
+//     if (req.user.role !== "Admin") {
+//         return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resource`, 403));
+//     }
+//     next();
+// });
+
+exports.authorizeRoles = (...roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return next(new ErrorHandler(`Role: ${req.user.role} is not allowed to access this resource`, 403));
+        }
+        next();
+    };
+}

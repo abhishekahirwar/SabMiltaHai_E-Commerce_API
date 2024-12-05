@@ -6,12 +6,19 @@ const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema(
     {
-        name: {
+        firstName: {
             type: String,
-            required: [true, "Please Enter Your Name"],
+            required: [true, "Please Enter Your First Name"],
             trim: true,
-            minLength: [4, "Name should have more than 4 characters"],
-            maxLength: [30, "Name can't exceed 30 characters"],
+            minLength: [4, "First Name should have more than 4 characters"],
+            maxLength: [30, "First Name can't exceed 30 characters"],
+        },
+        lastName: {
+            type: String,
+            required: [true, "Please Enter Your Last Name"],
+            trim: true,
+            minLength: [4, "Last Name should have more than 4 characters"],
+            maxLength: [30, "Last Name can't exceed 30 characters"],
         },
         email: {
             type: String,
@@ -38,6 +45,7 @@ const userSchema = new mongoose.Schema(
         },
         role: {
             type: String,
+            required: true,
             enum: ["User", "Admin"],
             default: "User",
         },

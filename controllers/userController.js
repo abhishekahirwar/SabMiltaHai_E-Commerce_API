@@ -16,10 +16,14 @@ const cloudinary = require('cloudinary').v2;
 exports.sendOtp = catchAsyncErrors(async (req, res, next) => {
     const { email } = req.body;
 
+    if (!email) {
+        return next(new ErrorHandler("Please enter email.", 400));
+    }
+
     const user = await User.findOne({ email });
 
     if (user) {
-        return next(new ErrorHandler("User is Already Registered.", 401));
+        return next(new ErrorHandler("User is Already Registered.", 400));
     }
 
     let otp, result;
@@ -45,7 +49,6 @@ exports.sendOtp = catchAsyncErrors(async (req, res, next) => {
 
         return res.status(201).json({
             success: true,
-            otp,
             message: "OTP Sent Successfully.",
         });
     } catch (err) {
@@ -55,26 +58,35 @@ exports.sendOtp = catchAsyncErrors(async (req, res, next) => {
 
 // Register a user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-    const { name, email, password, confirmPassword, otp } = req.body;
+    const { firstName, lastName, email, password, confirmPassword, otp } = req.body;
+
+    if (!confirmPassword || !otp) {
+        return next(new ErrorHandler("All fields are required.", 403));
+    }
 
     if (password !== confirmPassword) {
         return next(new ErrorHandler("Password is not matching with confirm password", 400));
     }
 
-    const { otp: storedOtp } = await OTP.findOne({ email }).sort({ createdAt: -1 });
+    // Check if OTP is valid
+    const otpRecord = await OTP.findOne({ email }).sort({ createdAt: -1 });
 
-    // OTP not found for the email
-    if (!storedOtp || otp !== storedOtp) {
-        return next(new ErrorHandler("The OTP is not valid", 400));
+    if (!otpRecord) {
+        return next(new ErrorHandler("Invalid OTP"));
+    }
+
+    if (otp !== otpRecord.otp) {
+        return next(new ErrorHandler("Invalid OTP"));
     }
 
     const user = await User.create({
-        name,
+        firstName,
+        lastName,
         email,
         password,
         avatar: {
-            public_id: "Sample_Public_id",
-            url: "Sample_Url",
+            public_id: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
+            url: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
         },
     });
 
@@ -91,13 +103,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 
     const user = await User.findOne({ email }).select("+password");
 
-    if (!user) {
-        return next(new ErrorHandler("Invalid email or password", 401));
-    }
-
-    const isPasswordMatched = await user.comparePassword(password);
-
-    if (!isPasswordMatched) {
+    if (!user || !(await user.comparePassword(password))) {
         return next(new ErrorHandler("Invalid email or password", 401));
     }
 
@@ -179,7 +185,10 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     user.resetPasswordExpire = undefined;
     await user.save();
 
-    sendToken(user, 201, 'Password Reset Successfully.', res);
+    return res.status(200).json({
+        success: true,
+        message: `Password Reset Successfully.`,
+    });
 });
 
 // Get User Detail
@@ -192,7 +201,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 
     return res.status(200).json({
         success: true,
-        user,
+        data: user,
         message: "User details retrieved successfully!",
     });
 });
@@ -218,10 +227,13 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
         await sendEmail({
             email: user.email,
             subject: `Password Update Confirmation`,
-            message: updatePasswordTemplate(user.email, user.name),
+            message: updatePasswordTemplate(user.email, user.firstName),
         });
 
-        sendToken(user, 200, 'Password Changed Successfully.', res);
+        return res.status(200).json({
+            success: true,
+            message: `Password changed successfully.`,
+        });
     } catch (err) {
         console.log("Error", err);
         return next(new ErrorHandler(err.message, 500));
@@ -231,7 +243,8 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 // Update User Profile
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
     const newUserData = {
-        name: req.body.name,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         email: req.body.email,
     };
 
@@ -303,15 +316,11 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
 
 // Update User Role (admin)
 exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
-    const newUserData = {
-        name: req.body.name,
-        email: req.body.email,
-        role: req.body.role,
-    };
+    const { role } = req.body;
 
     const user = await User.findByIdAndUpdate(
         req.params.id,
-        newUserData,
+        { role },
         {
             new: true,
             runValidators: true,
@@ -327,12 +336,12 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
         await sendEmail({
             email: user.email,
             subject: `User Role Update Confirmation`,
-            message: roleUpdatedTemplate(user.name, user.role),
+            message: roleUpdatedTemplate(user.firstName, user.role),
         });
 
         return res.status(200).json({
             success: true,
-            message: "User role update successfully.",
+            message: "User role updated successfully.",
         });
 
     } catch (err) {
